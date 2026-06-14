@@ -58,15 +58,26 @@ ne sont pas versionnés.
 
 ## Données
 
-Le projet s'appuie sur le jeu de données ouvertes **Permis délivrés** publié par
-la Ville de Québec. Il contient plus de 66 000 enregistrements comprenant
-notamment :
+Le projet s'appuie sur le jeu de données ouvertes
+[**Permis délivrés à la Ville de Québec**](https://www.donneesquebec.ca/recherche/dataset/permis-delivres-ville-de-quebec/resource/9555031e-cfc5-4b78-bec9-4ab84b549f67),
+publié sur Données Québec par la Ville de Québec sous licence
+[CC BY 4.0](https://www.donneesquebec.ca/licence/#cc-by). Il contient plus de
+66 000 enregistrements comprenant notamment :
 
 - le numéro et la date de délivrance du permis ;
 - l'adresse et l'arrondissement ;
 - le domaine, le type et la raison des travaux ;
 - le lot concerné ;
 - les coordonnées géographiques.
+
+Le fichier CSV peut être téléchargé et validé avec :
+
+```bash
+./scripts/download_data.sh
+```
+
+Le script enregistre les données dans `data/raw/permits.csv`. Ce fichier est
+généré localement et n'est pas versionné.
 
 ## Licence
 
