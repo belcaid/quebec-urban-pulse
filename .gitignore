@@ -1,0 +1,51 @@
+# Scala / SBT
+target/
+project/target/
+project/project/
+*.class
+*.jar
+*.tasty
+
+# Scala tooling
+.bsp/
+.bloop/
+.metals/
+.scala-build/
+.ammonite/
+
+# Frontend generated files
+frontend/node_modules/
+frontend/dist/
+frontend/.scalajs-bundler/
+
+# Local data and databases
+data/raw/*
+data/processed/*
+data/sqlite/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/sqlite/.gitkeep
+
+# Private development documentation
+docs/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.swp
+*~
+
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+tmp/
