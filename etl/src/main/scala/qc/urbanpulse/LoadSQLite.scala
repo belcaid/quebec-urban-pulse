@@ -14,10 +14,9 @@ object LoadSQLite:
     val connection = DriverManager.getConnection(DatabaseUrl)
 
     try
+      dropTables(connection)
       createTables(connection)
       createIndexes(connection)
-
-      clearTables(connection)
 
       val permits = ImportPermits.readCsv(CleanCsvPath)
       val qualitySummary = ImportPermits.readCsv(QualitySummaryPath)
@@ -45,7 +44,7 @@ object LoadSQLite:
         |  adresse_travaux TEXT NOT NULL,
         |  domaine TEXT NOT NULL,
         |  lots_impactes TEXT,
-        |  type_permis TEXT NOT NULL,
+        |  type_permis TEXT,
         |  arrondissement TEXT NOT NULL,
         |  raison TEXT,
         |  longitude REAL NOT NULL,
@@ -82,10 +81,10 @@ object LoadSQLite:
     execute(connection, "CREATE INDEX IF NOT EXISTS idx_permits_type_permis ON permits(type_permis)")
     execute(connection, "CREATE INDEX IF NOT EXISTS idx_quality_issue_type ON data_quality_issues(issue_type)")
 
-  private def clearTables(connection: Connection): Unit =
-    execute(connection, "DELETE FROM permits")
-    execute(connection, "DELETE FROM data_quality_summary")
-    execute(connection, "DELETE FROM data_quality_issues")
+  private def dropTables(connection: Connection): Unit =
+    execute(connection, "DROP TABLE IF EXISTS permits")
+    execute(connection, "DROP TABLE IF EXISTS data_quality_summary")
+    execute(connection, "DROP TABLE IF EXISTS data_quality_issues")
 
   private def insertPermits(connection: Connection, permits: ImportedPermits): Unit =
     val sql =
@@ -111,7 +110,7 @@ object LoadSQLite:
         statement.setString(3, permits.value(row, "ADRESSE_TRAVAUX"))
         statement.setString(4, permits.value(row, "DOMAINE"))
         setNullableString(statement, 5, permits.value(row, "LOTS_IMPACTES"))
-        statement.setString(6, permits.value(row, "TYPE_PERMIS"))
+        setNullableString(statement, 6, permits.value(row, "TYPE_PERMIS"))
         statement.setString(7, permits.value(row, "ARRONDISSEMENT"))
         setNullableString(statement, 8, permits.value(row, "RAISON"))
         statement.setDouble(9, permits.value(row, "LONGITUDE").toDouble)

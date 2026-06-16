@@ -14,7 +14,7 @@ expérience interactive permettant d'observer l'évolution urbaine de Québec.
 ## Fonctionnalités
 
 - carte interactive des permis géolocalisés ;
-- recherche par adresse ;
+- recherche par adresse ou numéro de permis ;
 - filtres par année, arrondissement, domaine, raison et type de permis ;
 - fiches détaillées pour chaque permis ;
 - indicateurs clés et visualisations statistiques ;
