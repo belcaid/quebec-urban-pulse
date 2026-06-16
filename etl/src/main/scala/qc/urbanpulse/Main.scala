@@ -4,3 +4,4 @@ object Main:
 
   def main(_args: Array[String]): Unit =
     CleanPermits.run()
+    LoadSQLite.run()
