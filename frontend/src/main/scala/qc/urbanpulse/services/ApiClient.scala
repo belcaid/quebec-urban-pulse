@@ -1,7 +1,7 @@
 package qc.urbanpulse.services
 
 import org.scalajs.dom
-import qc.urbanpulse.models.{CountByValue, CountByYear, FilterOptions, Permit, PermitFilters, PermitRelation, SummaryStats}
+import qc.urbanpulse.models.{CountByValue, CountByYear, DataQualityMetric, FilterOptions, Permit, PermitFilters, PermitRelation, SummaryStats}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -73,6 +73,16 @@ object ApiClient:
           domaine = text(item, "domaine"),
           raison = text(item, "raison"),
           count = number(item, "count").toLong
+        )
+      }
+    }
+
+  def fetchDataQualitySummary(): Future[List[DataQualityMetric]] =
+    fetchJson("/api/data-quality/summary").map { data =>
+      data.asInstanceOf[js.Array[js.Dynamic]].toList.map { item =>
+        DataQualityMetric(
+          metric = text(item, "metric"),
+          value = text(item, "value")
         )
       }
     }

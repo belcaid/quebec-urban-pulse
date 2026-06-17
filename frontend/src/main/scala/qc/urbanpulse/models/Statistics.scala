@@ -15,3 +15,5 @@ final case class CountByYear(year: Int, count: Long)
 final case class CountByValue(value: String, count: Long)
 
 final case class PermitRelation(typePermis: String, domaine: String, raison: String, count: Long)
+
+final case class DataQualityMetric(metric: String, value: String)

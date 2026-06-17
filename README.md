@@ -18,6 +18,7 @@ expérience interactive permettant d'observer l'évolution urbaine de Québec.
 - filtres par année, arrondissement, domaine, raison et type de permis ;
 - fiches détaillées pour chaque permis ;
 - indicateurs clés et visualisations statistiques ;
+- résumé qualité des données nettoyées ;
 - pipeline automatisé d'import et de nettoyage des données.
 
 ## Aperçu

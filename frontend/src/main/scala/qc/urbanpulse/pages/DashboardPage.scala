@@ -4,7 +4,7 @@ import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 import qc.urbanpulse.animations.PageAnimations
 import qc.urbanpulse.components.StatsCard
-import qc.urbanpulse.models.{CountByValue, CountByYear, PermitRelation, SummaryStats}
+import qc.urbanpulse.models.{CountByValue, CountByYear, DataQualityMetric, PermitRelation, SummaryStats}
 import qc.urbanpulse.services.ApiClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,6 +24,7 @@ object DashboardPage:
 
   def view: Element =
     val summary = Var[Option[SummaryStats]](None)
+    val qualitySummary = Var[List[DataQualityMetric]](Nil)
     val error = Var[Option[String]](None)
     val relationData = Var(RelationData(Nil, Nil, Nil, Nil))
 
@@ -32,6 +33,7 @@ object DashboardPage:
       onMountCallback { _ =>
         PageAnimations.animatePageItems(".dashboard-page")
         loadSummary(summary, error)
+        loadDataQualitySummary(qualitySummary, error)
         dom.window.setTimeout(
           () => loadCharts(error, relationData),
           150
@@ -78,6 +80,9 @@ object DashboardPage:
             )
         }
       ),
+      child.maybe <-- qualitySummary.signal.map { metrics =>
+        if metrics.isEmpty then None else Some(qualityPanel(metrics))
+      },
       sectionTag(
         cls := "dashboard-chart-grid animate-item",
         chartCard("year-chart", "Évolution annuelle", "Volume par année. 2026 est partielle."),
@@ -95,6 +100,17 @@ object DashboardPage:
         summary.set(Some(value))
       case Failure(_) =>
         error.set(Some("Impossible de charger le résumé statistique."))
+    }
+
+  private def loadDataQualitySummary(
+      qualitySummary: Var[List[DataQualityMetric]],
+      error: Var[Option[String]]
+  ): Unit =
+    ApiClient.fetchDataQualitySummary().onComplete {
+      case Success(values) =>
+        qualitySummary.set(values)
+      case Failure(_) =>
+        error.set(Some("Impossible de charger le résumé qualité des données."))
     }
 
   private def loadCharts(error: Var[Option[String]], relationData: Var[RelationData]): Unit =
@@ -182,6 +198,32 @@ object DashboardPage:
         cls := "chart-canvas-wrap",
         canvasTag(idAttr := canvasId)
       )
+    )
+
+  private def qualityPanel(metrics: List[DataQualityMetric]): Element =
+    val values = metrics.map(metric => metric.metric -> metric.value).toMap
+
+    sectionTag(
+      cls := "quality-panel animate-item",
+      div(
+        cls := "quality-panel-copy",
+        h2("Qualité des données"),
+        p("Résumé des contrôles effectués pendant l'ETL avant chargement dans SQLite.")
+      ),
+      div(
+        cls := "quality-metrics",
+        qualityMetric("Permis chargés", values.getOrElse("clean_permits", "0")),
+        qualityMetric("Doublons supprimés", values.getOrElse("removed_exact_duplicates", "0")),
+        qualityMetric("Sans numéro exclus", values.getOrElse("removed_missing_permit_number", "0")),
+        qualityMetric("Lots manquants", values.getOrElse("raw_missing_LOTS_IMPACTES", "0"))
+      )
+    )
+
+  private def qualityMetric(label: String, value: String): Element =
+    div(
+      cls := "quality-metric",
+      strong(formatNumber(value.toLongOption.getOrElse(0L))),
+      span(label)
     )
 
   private def relationPanel(data: Signal[RelationData]): Element =
