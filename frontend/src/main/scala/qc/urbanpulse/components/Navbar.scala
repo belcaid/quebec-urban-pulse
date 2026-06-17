@@ -3,7 +3,7 @@ package qc.urbanpulse.components
 import com.raquo.laminar.api.L.{*, given}
 
 object Navbar:
-  def view(isDarkTheme: Var[Boolean]): Element =
+  def view(isDarkTheme: Var[Boolean], currentRoute: Signal[String]): Element =
     val menuOpen = Var(false)
 
     headerTag(
@@ -52,10 +52,25 @@ object Navbar:
       ),
       navTag(
         cls := "navbar-actions",
-        a(cls := "nav-link", href := "#/map", onClick --> (_ => menuOpen.set(false)), "Explorer"),
-        a(cls := "nav-link", href := "#/dashboard", onClick --> (_ => menuOpen.set(false)), "Comprendre"),
-        a(cls := "nav-link", href := "#/about", onClick --> (_ => menuOpen.set(false)), "À propos")
+        navLink("Explorer", "#/map", "/map", currentRoute, menuOpen),
+        navLink("Comprendre", "#/dashboard", "/dashboard", currentRoute, menuOpen),
+        navLink("À propos", "#/about", "/about", currentRoute, menuOpen)
       )
+    )
+
+  private def navLink(
+      label: String,
+      hrefValue: String,
+      route: String,
+      currentRoute: Signal[String],
+      menuOpen: Var[Boolean]
+  ): Anchor =
+    a(
+      cls := "nav-link",
+      cls.toggle("is-active") <-- currentRoute.map(_ == route),
+      href := hrefValue,
+      onClick --> (_ => menuOpen.set(false)),
+      label
     )
 
   private def sunIcon: SvgElement =

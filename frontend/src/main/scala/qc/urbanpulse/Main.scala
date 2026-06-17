@@ -26,7 +26,7 @@ def main(): Unit =
     div(
       cls := "app-shell",
       onMountCallback(_ => PageAnimations.animateChrome()),
-      Navbar.view(isDarkTheme),
+      Navbar.view(isDarkTheme, currentRoute.signal),
       div(
         cls := "route-view",
         child <-- currentRoute.signal.map {
