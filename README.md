@@ -20,6 +20,20 @@ expérience interactive permettant d'observer l'évolution urbaine de Québec.
 - indicateurs clés et visualisations statistiques ;
 - pipeline automatisé d'import et de nettoyage des données.
 
+## Aperçu
+
+### Accueil
+
+![Page d'accueil de Québec Urban Pulse](assets/screenshots/home-desktop.webp)
+
+### Explorer
+
+![Carte interactive des permis](assets/screenshots/explorer-desktop.webp)
+
+### Comprendre
+
+![Dashboard des tendances et relations clés](assets/screenshots/comprendre-desktop.webp)
+
 ## Architecture
 
 ```text
@@ -53,8 +67,9 @@ ne sont pas versionnés.
 - Laminar
 - Leaflet
 - Chart.js
-- Tailwind CSS
+- Cytoscape.js
 - GSAP
+- CSS natif
 
 ## Données
 
@@ -78,6 +93,42 @@ Le fichier CSV peut être téléchargé et validé avec :
 
 Le script enregistre les données dans `data/raw/permits.csv`. Ce fichier est
 généré localement et n'est pas versionné.
+
+## Lancement local
+
+Télécharger le fichier CSV officiel :
+
+```bash
+./scripts/download_data.sh
+```
+
+Construire les fichiers nettoyés et charger la base SQLite :
+
+```bash
+cd etl
+sbt run
+```
+
+Lancer l'API REST :
+
+```bash
+cd backend
+sbt run
+```
+
+Compiler et servir le frontend dans un autre terminal :
+
+```bash
+cd frontend
+sbt fastLinkJS
+python3 -m http.server 4174
+```
+
+L'application est ensuite disponible à l'adresse :
+
+```text
+http://localhost:4174/
+```
 
 ## Licence
 

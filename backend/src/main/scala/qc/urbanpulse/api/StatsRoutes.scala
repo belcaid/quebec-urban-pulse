@@ -19,11 +19,23 @@ object StatsRoutes:
     case GET -> Root / "api" / "stats" / "by-year" =>
       IO.blocking(StatsRepository.byYear()).flatMap(Ok(_))
 
+    case GET -> Root / "api" / "stats" / "by-month" =>
+      IO.blocking(StatsRepository.byMonth()).flatMap(Ok(_))
+
     case GET -> Root / "api" / "stats" / "by-borough" =>
       IO.blocking(StatsRepository.byColumn("arrondissement")).flatMap(Ok(_))
 
     case GET -> Root / "api" / "stats" / "by-domain" =>
       IO.blocking(StatsRepository.byColumn("domaine")).flatMap(Ok(_))
+
+    case GET -> Root / "api" / "stats" / "by-type" =>
+      IO.blocking(StatsRepository.byColumn("type_permis")).flatMap(Ok(_))
+
+    case GET -> Root / "api" / "stats" / "by-reason" =>
+      IO.blocking(StatsRepository.byColumn("raison")).flatMap(Ok(_))
+
+    case GET -> Root / "api" / "stats" / "relations" :? LimitQueryParam(limit) =>
+      IO.blocking(StatsRepository.relations(limit.getOrElse(500).min(500).max(5))).flatMap(Ok(_))
 
     case GET -> Root / "api" / "data-quality" / "summary" =>
       IO.blocking(StatsRepository.dataQualitySummary()).flatMap(Ok(_))

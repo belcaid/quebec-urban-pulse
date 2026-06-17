@@ -5,16 +5,17 @@ import com.comcast.ip4s.{host, port}
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits.*
 import org.http4s.server.Router
+import org.http4s.server.middleware.CORS
 import qc.urbanpulse.api.{HealthRoutes, PermitRoutes, StatsRoutes}
 
 object Main extends IOApp.Simple:
 
   private val httpApp =
-    Router(
+    CORS.httpApp(Router(
       "/" -> HealthRoutes.routes,
       "/" -> PermitRoutes.routes,
       "/" -> StatsRoutes.routes
-    ).orNotFound
+    ).orNotFound)
 
   override def run: IO[Unit] =
     EmberServerBuilder

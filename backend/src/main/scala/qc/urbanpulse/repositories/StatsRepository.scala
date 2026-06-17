@@ -1,7 +1,7 @@
 package qc.urbanpulse.repositories
 
 import qc.urbanpulse.db.Database
-import qc.urbanpulse.models.{CountByValue, CountByYear, DataQualityIssue, DataQualityMetric, SummaryStats}
+import qc.urbanpulse.models.{CountByValue, CountByYear, DataQualityIssue, DataQualityMetric, PermitRelation, SummaryStats}
 
 import java.sql.{Connection, ResultSet}
 import scala.collection.mutable.ListBuffer
@@ -40,6 +40,22 @@ object StatsRepository:
     finally
       connection.close()
 
+  def byMonth(): List[CountByValue] =
+    val connection = Database.connection()
+
+    try
+      val sql =
+        """SELECT strftime('%m', date_delivrance) AS value, COUNT(*) AS count
+          |FROM permits
+          |GROUP BY value
+          |ORDER BY value""".stripMargin
+
+      query(connection, sql) { resultSet =>
+        CountByValue(resultSet.getString("value"), resultSet.getLong("count"))
+      }
+    finally
+      connection.close()
+
   def byColumn(column: String): List[CountByValue] =
     val connection = Database.connection()
 
@@ -54,6 +70,42 @@ object StatsRepository:
       query(connection, sql) { resultSet =>
         CountByValue(resultSet.getString("value"), resultSet.getLong("count"))
       }
+    finally
+      connection.close()
+
+  def relations(limit: Int): List[PermitRelation] =
+    val connection = Database.connection()
+
+    try
+      val sql =
+        """SELECT type_permis, domaine, raison, COUNT(*) AS count
+          |FROM permits
+          |WHERE type_permis IS NOT NULL AND type_permis != ''
+          |  AND domaine IS NOT NULL AND domaine != ''
+          |  AND raison IS NOT NULL AND raison != ''
+          |GROUP BY type_permis, domaine, raison
+          |ORDER BY count DESC
+          |LIMIT ?""".stripMargin
+
+      val statement = connection.prepareStatement(sql)
+
+      try
+        statement.setInt(1, limit)
+
+        val resultSet = statement.executeQuery()
+        val values = ListBuffer[PermitRelation]()
+
+        while resultSet.next() do
+          values += PermitRelation(
+            typePermis = resultSet.getString("type_permis"),
+            domaine = resultSet.getString("domaine"),
+            raison = resultSet.getString("raison"),
+            count = resultSet.getLong("count")
+          )
+
+        values.toList
+      finally
+        statement.close()
     finally
       connection.close()
 
